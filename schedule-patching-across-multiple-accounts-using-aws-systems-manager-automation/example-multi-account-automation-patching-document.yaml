@@ -1,0 +1,49 @@
+description: |-
+  **Description**
+  This document runs the Command document ```AWS-RunPatchBaseline``` on the specified instances.
+schemaVersion: '0.3'
+assumeRole: '{{ AutomationAssumeRole }}'
+parameters:
+  AutomationAssumeRole:
+    description: The ARN of the Automation service role to assume.
+    type: String
+  ResourceGroupName:
+    description: The name of the Resource Group to target.
+    type: String
+  SnapshotId:
+    default: ''
+    description: (Optional) The snapshot ID to use to retrieve a patch baseline snapshot.
+    type: String
+  RebootOption:
+    default: RebootIfNeeded
+    description: '(Optional) Reboot behavior after a patch Install operation. If you choose NoReboot and patches are installed, the instance is marked as non-compliant  until a subsequent reboot and scan.'
+    type: String
+  InstallOverrideList:
+    default: ''
+    description: (Optional) An https URL or an Amazon S3 path-style URL to the list of patches to be installed. This patch installation list overrides the patches specified by the default patch baseline.
+    type: String
+  Operation:
+    default: Scan
+    description: (Required) The update or configuration to perform on the instance. The system checks if patches specified in the patch baseline are installed on the instance. The install operation installs patches missing from the baseline.
+    type: String
+mainSteps:
+  - inputs:
+      MaxErrors: 10%
+      Parameters:
+        SnapshotId: '{{ SnapshotId }}'
+        RebootOption: '{{ RebootOption }}'
+        InstallOverrideList: '{{ InstallOverrideList }}'
+        Operation: '{{ Operation }}'
+      MaxConcurrency: 10%
+      Targets:
+        - Values:
+            - '{{ ResourceGroupName }}'
+          Key: 'resource-groups:Name'
+      DocumentName: AWS-RunPatchBaseline
+    name: runPatchBaseline
+    action: 'aws:runCommand'
+    timeoutSeconds: 7200
+    onFailure: Abort
+    description: This command runs the Command document ```AWS-RunPatchBaseline``` on the specified instances.
+outputs:
+- runPatchBaseline.OutputPayload

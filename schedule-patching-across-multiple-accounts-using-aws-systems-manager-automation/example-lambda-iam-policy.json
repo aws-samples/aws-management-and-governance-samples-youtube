@@ -1,0 +1,32 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ssm:StartAutomationExecution"
+            ],
+            "Resource": [
+                "arn:aws:ssm:<REGION>:<ACCOUNT-ID>:automation-definition/<AUTOMATION-DOCUMENT-NAME>:$DEFAULT"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<ACCOUNT-ID>:role/AWS-SystemsManager-AutomationAdministrationRole",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:<REGION>:<ACCOUNT-ID>:*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:<REGION>:<ACCOUNT-ID>:log-group:/aws/lambda/<LAMBDA-FUNCTION-NAME>:*",
+            "Effect": "Allow"
+        }
+    ]
+}
